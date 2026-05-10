@@ -1,0 +1,91 @@
+@import url('/fonts/Saira.css');
+@import url('/fonts/MaterialIcons.css');
+@import 'tailwindcss';
+
+:root {
+	font-family: 'Saira', 'sans-serif';
+}
+html {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+body {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	width: 100%;
+	overflow: hidden;
+	background-color: #0f172a;
+}
+
+/* Consistent scrollbar styling across all browsers */
+/* Firefox */
+* {
+	scrollbar-width: thin;
+	scrollbar-color: oklch(70.7% 0.165 254.624) transparent;
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+
+::-webkit-scrollbar-track {
+	background: transparent;
+	border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+	background: oklch(70.7% 0.165 254.624);
+	border-radius: 4px;
+	border: 1px solid transparent;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: oklch(70.7% 0.165 254.624);
+}
+
+::-webkit-scrollbar-thumb:active {
+	background: oklch(70.7% 0.165 254.624);
+}
+
+::-webkit-scrollbar-corner {
+	background: transparent;
+}
+
+button {
+	cursor: pointer;
+}
+.backdrop-blur-webkit {
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+}
+
+.no-ring {
+	outline: none;
+	box-shadow: none;
+}
+
+.glow {
+	text-shadow:
+		0 0 5px oklch(70.7% 0.165 254.624),
+		0 0 20px oklch(70.7% 0.165 254.624),
+		0 0 40px oklch(70.7% 0.165 254.624);
+}
+.hide-scrollbar {
+	/* Enable scrolling */
+	overflow: auto;
+
+	/* Firefox */
+	scrollbar-width: none;
+
+	/* IE 10+ / old Edge */
+	-ms-overflow-style: none;
+}
+
+/* WebKit (Chrome, Safari, newer Edge) */
+.hide-scrollbar::-webkit-scrollbar {
+	display: none;
+}
