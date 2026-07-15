@@ -3,5 +3,5 @@ import type { PageLoad } from './$types';
 
 export const load: PageLoad = () => {
 	throw redirect(302, '/soon');
-	//return {	title: `App`};
+	//return {	title: `Apply`};
 };

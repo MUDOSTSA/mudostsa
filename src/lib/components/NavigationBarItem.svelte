@@ -9,7 +9,11 @@
 		children: () => any;
 	} = $props();
 
-	let activeClass = $derived(active ? 'bg-blue-400 text-black ' : 'hover:text-blue-400');
+	let activeClass = $derived(active ? 'border-b-blue-400  ' : 'hover:text-blue-300');
 </script>
 
-<a {href} class={`px-4 py-2  ${activeClass}`}>{@render children()}</a>
+<a
+	{href}
+	class={`border-b-2 border-transparent px-2 py-2 text-sm whitespace-nowrap xl:px-4  ${activeClass}`}
+	>{@render children()}</a
+>
