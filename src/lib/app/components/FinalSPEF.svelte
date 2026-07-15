@@ -199,7 +199,7 @@
 			if (termsError) throw new Error(termsError.message);
 			if (eventsError) throw new Error(eventsError.message);
 
-			terms = termsData ?? [];
+			terms = termsData ? [termsData[0]] : [];
 			events = eventsData ?? [];
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'An unknown error occurred';
@@ -438,6 +438,6 @@
 			title="Preview"
 			src={generatedSPEFLink}
 			class="h-[500px] w-full border-2 border-blue-400"
-		/>
+		></iframe>
 	{/if}
 </form>

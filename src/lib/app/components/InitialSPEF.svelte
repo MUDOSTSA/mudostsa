@@ -111,7 +111,7 @@
 				throw new Error(termsError.message);
 			}
 			if (termsData) {
-				terms = termsData;
+				terms = termsData ? [termsData[0]] : [];
 			}
 			const { data: eventsData, error: eventsError } = await getEventTitles();
 			if (eventsError) {
