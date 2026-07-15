@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { generateInitialSPEF } from '$lib/app/lib/helper_functions';
+	import { generateInitialSPEF, isAtLeastDaysAway } from '$lib/app/lib/helper_functions';
 	import { getAcademicTerms, getEventTitles } from '$lib/app/lib/supabase';
 	import {
 		fieldInput,
@@ -111,7 +111,13 @@
 				throw new Error(termsError.message);
 			}
 			if (termsData) {
-				terms = termsData ? [termsData[0]] : [];
+				if (termsData[0] && isAtLeastDaysAway(new Date(termsData[0].term_end), 30)) {
+					terms = termsData ? [termsData[0]] : [];
+				} else if (termsData[1]) {
+					terms = termsData ? [termsData[1]] : [];
+				} else {
+					terms = [];
+				}
 			}
 			const { data: eventsData, error: eventsError } = await getEventTitles();
 			if (eventsError) {

@@ -1,5 +1,9 @@
 <script lang="ts">
-	import { extractDataFromPDF, generateFinalSPEF } from '$lib/app/lib/helper_functions';
+	import {
+		extractDataFromPDF,
+		generateFinalSPEF,
+		isAtLeastDaysAway
+	} from '$lib/app/lib/helper_functions';
 
 	import {
 		fieldInput,
@@ -199,7 +203,15 @@
 			if (termsError) throw new Error(termsError.message);
 			if (eventsError) throw new Error(eventsError.message);
 
-			terms = termsData ? [termsData[0]] : [];
+			if (termsData) {
+				if (termsData[0] && isAtLeastDaysAway(new Date(termsData[0].term_end), 30)) {
+					terms = termsData ? [termsData[0]] : [];
+				} else if (termsData[1]) {
+					terms = termsData ? [termsData[1]] : [];
+				} else {
+					terms = [];
+				}
+			}
 			events = eventsData ?? [];
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'An unknown error occurred';

@@ -384,3 +384,14 @@ export function readTerm(term: string): {
 	const academicYear = parseInt(term.split(',')[1].trim().split(' ')[1].trim().split('-')[0]);
 	return { term_number: termNumber, academic_year: academicYear };
 }
+export function isAtLeastDaysAway(date: Date | string, days: number): boolean {
+	const target = new Date(date);
+	target.setHours(0, 0, 0, 0);
+
+	const today = new Date();
+	today.setHours(0, 0, 0, 0);
+
+	const diffDays = Math.floor((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+	return diffDays >= days;
+}
