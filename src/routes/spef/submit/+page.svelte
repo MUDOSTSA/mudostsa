@@ -56,7 +56,9 @@
 			file = files[0];
 			const result = await extractDataFromPDF(file);
 			blobUrl = URL.createObjectURL(file);
-
+			if (!result.recentlyAttendedEvent) {
+				result.recentlyAttendedEvent = 'None';
+			}
 			spef = { ...result };
 		} else {
 			spef = null;
