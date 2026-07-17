@@ -136,7 +136,7 @@
 						{#each Object.entries(spef) as [key, value]}
 							<div class="grid grid-cols-2">
 								<span class="text-blue-400 italic">{keyDisplay[key] || key}</span>
-								{#if value}
+								{#if value || typeof value === "boolean"}
 									<span
 										>{String(value) == 'true'
 											? 'Yes'
