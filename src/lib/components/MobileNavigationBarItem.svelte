@@ -14,6 +14,6 @@
 
 <a
 	{href}
-	class={`mx-8 flex items-center justify-center border-b-2 border-transparent py-8 text-sm text-white hover:bg-blue-400 hover:text-black ${activeClass}`}
+	class={` z-40 mx-8 flex items-center justify-center border-b-2 border-transparent py-8 text-sm text-white hover:bg-blue-400 hover:text-black ${activeClass}`}
 	>{@render children()}</a
 >

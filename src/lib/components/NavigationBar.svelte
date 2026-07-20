@@ -47,7 +47,7 @@
 		>
 	</div>
 </div>
-<div class="fixed flex p-4 lg:hidden">
+<div class="fixed z-100 flex p-4 lg:hidden">
 	<button
 		onclick={() => (collapsed = !collapsed)}
 		class="absolute z-50 flex h-10 w-11 items-center justify-center border-2 border-blue-400 p-1 text-blue-400 transition-colors hover:bg-blue-400 hover:text-black"
@@ -56,7 +56,7 @@
 	{#if !collapsed}
 		<!-- collapsable mobile menu -->
 		<div
-			class="absolute top-0 left-0 z-49 h-screen w-screen space-y-8 bg-blue-950/60 px-4 py-20 backdrop-blur-lg"
+			class="absolute top-0 left-0 h-screen w-screen space-y-8 bg-blue-950/60 px-4 py-20 backdrop-blur-2xl"
 		>
 			<a
 				href="/apply"

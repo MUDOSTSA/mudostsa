@@ -119,9 +119,11 @@
 		maxNumberOfFiles={1}
 		onFilesChange={handleFilesChange}
 	/>
-	<div class={`${container} flex h-140 items-center justify-between gap-4`}>
+	<div
+		class={`${container} flex min-h-140 flex-col items-center justify-between gap-4 md:h-140 md:flex-row`}
+	>
 		<div
-			class="flex h-full w-1/3 items-center justify-center border-2 border-blue-400 bg-gradient-to-t from-blue-500/50 p-2"
+			class="flex h-full min-h-100 w-full items-center justify-center border-2 border-blue-400 bg-gradient-to-t from-blue-500/50 p-2 md:min-h-[0] md:w-1/3"
 		>
 			{#if blobUrl}
 				<iframe title="SPEF Preview" src={blobUrl} class="h-full w-full"></iframe>
@@ -129,14 +131,14 @@
 				<span class="text-white">Upload SPEF for a preview</span>
 			{/if}
 		</div>
-		<div class="flex h-full w-full flex-1 flex-col items-start justify-start p-2">
-			<div class="flex w-full flex-1 items-start justify-start">
+		<div class="flex h-full w-full flex-1 flex-col items-start justify-start overflow-hidden p-2">
+			<div class="flex w-full flex-1 items-start justify-start truncate">
 				{#if spef}
 					<div class="flex flex-col gap-2 text-white">
 						{#each Object.entries(spef) as [key, value]}
-							<div class="grid grid-cols-2">
+							<div class="grid grid-cols-1 md:grid-cols-2">
 								<span class="text-blue-400 italic">{keyDisplay[key] || key}</span>
-								{#if value || typeof value === "boolean"}
+								{#if value || typeof value === 'boolean'}
 									<span
 										>{String(value) == 'true'
 											? 'Yes'
@@ -152,13 +154,11 @@
 					</div>
 				{:else}
 					<div class="flex h-full w-full items-center justify-center">
-						<span class="text-white italic"
-							>A summary of your SPEF will appear here once uploaded</span
-						>
+						<span class="text-white/50 italic">No SPEF uploaded</span>
 					</div>
 				{/if}
 			</div>
-			<div class="flex h-fit w-full flex-col gap-2">
+			<div class="mt-12 flex h-fit w-full flex-col gap-2">
 				{#if missingFields.length > 0}
 					<span class={formError}
 						>Missing fields: {missingFields.map(([key]) => keyDisplay[key] || key).join(', ')}</span

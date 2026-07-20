@@ -4,6 +4,10 @@
 	let { children } = $props();
 	const spefLinks = [
 		{
+			name: 'View Submission',
+			href: '/spef/view'
+		},
+		{
 			name: 'New',
 			href: '/spef/new'
 		},

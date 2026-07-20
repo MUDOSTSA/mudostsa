@@ -13,7 +13,7 @@
 </script>
 
 <Dialog {title} bind:shown>
-	<div class="flex w-full flex-col items-center justify-center space-y-12 p-4 px-36 pt-12">
+	<div class="flex w-full flex-col items-center justify-center space-y-12 p-4 pt-12 md:px-36">
 		<div class={`text-white`}>{@render children()}</div>
 		<div class="flex items-center justify-center gap-2">
 			<button

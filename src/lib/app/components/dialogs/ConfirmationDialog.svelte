@@ -67,7 +67,7 @@
 </script>
 
 <Dialog bind:shown {title} onClose={handleClose}>
-	<div class="min-w-96 space-y-4 px-4 py-4">
+	<div class="min-w-96 space-y-4 py-4 md:px-4">
 		<!-- Warning Message -->
 		<div class={`${warningClasses} px-4 py-3`}>
 			<div class="mb-2 flex items-center gap-2">

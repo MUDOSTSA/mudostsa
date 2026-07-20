@@ -421,3 +421,10 @@ export async function getAllSPEFSubmissions(
 		.select('*')
 		.order('created_at', { ascending: false });
 }
+export async function getAnonSubmissionsByStudentNumber(studentNumber: string) {
+	return await supabase
+		.from('spef_submissions_anon')
+		.select(`*,academic_terms (term_number, academic_year)`)
+		.eq('student_number', studentNumber)
+		.order('created_at', { ascending: false });
+}

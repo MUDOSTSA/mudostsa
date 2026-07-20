@@ -17,5 +17,7 @@
 >
 <div class="h-screen w-screen overflow-auto bg-[url('/bg.png')] bg-cover">
 	<NavigationBar></NavigationBar>
-	<div class="min-h-full w-full overflow-hidden px-4 pt-36 xl:px-12">{@render children()}</div>
+	<div class="min-h-full w-full overflow-hidden px-4 pt-18 xl:px-12 xl:pt-24">
+		{@render children()}
+	</div>
 </div>

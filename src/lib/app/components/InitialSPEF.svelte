@@ -3,6 +3,8 @@
 	import { getAcademicTerms, getEventTitles } from '$lib/app/lib/supabase';
 	import {
 		fieldInput,
+		flexPrimaryButton,
+		flexSecondaryButton,
 		formError,
 		primaryButton,
 		secondaryButton
@@ -209,19 +211,21 @@
 		/>
 		<span class="text-white/50 italic">I confirm that I am a member of the organization</span>
 	</div>
-	<div class="mt-4 flex w-full items-center justify-center gap-2">
+	<div
+		class="mt-4 flex w-full flex-col items-center justify-center gap-2 *:w-full md:flex-row md:*:w-fit"
+	>
 		{#if generatedSPEFLink}
 			<button
 				onclick={handleDownload}
 				type="button"
-				class={primaryButton}
+				class={flexPrimaryButton}
 				disabled={isSubmitting || !generatedSPEFLink}>Download SPEF</button
 			>
 		{/if}
-		<button type="submit" class={primaryButton} disabled={isSubmitting}
+		<button type="submit" class={flexPrimaryButton} disabled={isSubmitting}
 			>{isSubmitting ? 'Generating' : 'Generate SPEF'}</button
 		>
-		<button onclick={handleClear} type="button" class={secondaryButton} disabled={isSubmitting}
+		<button onclick={handleClear} type="button" class={flexSecondaryButton} disabled={isSubmitting}
 			>Clear</button
 		>
 	</div>

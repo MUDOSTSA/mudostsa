@@ -395,3 +395,17 @@ export function isAtLeastDaysAway(date: Date | string, days: number): boolean {
 
 	return diffDays >= days;
 }
+
+export function generateRandomString(length = 25): string {
+	const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+	let result = '';
+
+	const randomValues = new Uint32Array(length);
+	crypto.getRandomValues(randomValues);
+
+	for (let i = 0; i < length; i++) {
+		result += chars[randomValues[i] % chars.length];
+	}
+
+	return result;
+}

@@ -60,9 +60,9 @@
 			onchange={handleFileSelected}
 		/>
 
-		<div class="flex items-center justify-center gap-2">
+		<div class="flex flex-col items-center justify-center gap-2 *:w-full md:flex-row md:*:w-fit">
 			<button onclick={handleUploadSignedSPEF} class={flexPrimaryButton}>
-				{pendingPDF.file ? `Change [${pendingPDF.file.name}]` : 'Upload Signed SPEF'}
+				{pendingPDF.file ? `Change PDF` : 'Upload Signed SPEF'}
 			</button>
 
 			{#if pendingPDF.file}
