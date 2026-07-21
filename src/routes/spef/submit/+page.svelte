@@ -34,9 +34,8 @@
 		spasId: 'SPAS ID',
 		recentlyAttendedEvent: 'Recently Attended Event'
 	};
-	let resubmitConfirmationDialogShown = $state(false);
+	let submissionError = $state('');
 	let processingSubmission = $state(false);
-	let processingResubmission = $state(false);
 	let submissionInfoShown = $state(false);
 	let submissionReceipt = $state('');
 	let file: File;
@@ -65,7 +64,7 @@
 			blobUrl = null;
 		}
 	}
-	let confirmFunction: () => any = $state(() => {});
+
 	async function handleSubmit() {
 		processingSubmission = true;
 		submissionReceipt = '';
@@ -85,11 +84,11 @@
 							programYear: spef.programYear ?? 'Unknown'
 						}
 					);
-					submissionReceipt = result.data?.id || 'NULL_SUBMISSION';
+					submissionReceipt = result || 'NULL_SUBMISSION';
 					submissionInfoShown = true;
 				}
 			} catch (e) {
-				console.error(e);
+				submissionError = e instanceof Error ? e.message : 'An unknown error occurred';
 			}
 		}
 		processingSubmission = false;
@@ -104,14 +103,6 @@
 		<span class="w-full text-center">{submissionReceipt}</span>
 	</div>
 </InfoDialog>
-<ConfirmationDialog
-	isProcessing={processingResubmission}
-	bind:shown={resubmitConfirmationDialogShown}
-	onConfirm={confirmFunction}
-	title="Resubmit SPEF"
-	summaryText="There is already an existing SPEF for this term. Resubmit?"
-	confirmLabel="Resubmit"
-></ConfirmationDialog>
 <div class={innerContent}>
 	<FileUploadField
 		message="Drag SPEF here or click to browse"
@@ -126,7 +117,7 @@
 			class="flex h-full min-h-100 w-full items-center justify-center border-2 border-blue-400 bg-gradient-to-t from-blue-500/50 p-2 md:min-h-[0] md:w-1/3"
 		>
 			{#if blobUrl}
-				<iframe title="SPEF Preview" src={blobUrl} class="h-full w-full"></iframe>
+				<iframe title="SPEF Preview" src={blobUrl} class="h-100 w-full"></iframe>
 			{:else}
 				<span class="text-white">Upload SPEF for a preview</span>
 			{/if}
@@ -163,6 +154,9 @@
 					<span class={formError}
 						>Missing fields: {missingFields.map(([key]) => keyDisplay[key] || key).join(', ')}</span
 					>
+				{/if}
+				{#if submissionError}
+					<span class={formError}>{submissionError}</span>
 				{/if}
 				<button
 					onclick={handleSubmit}

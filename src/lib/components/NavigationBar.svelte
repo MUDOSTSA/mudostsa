@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { fly } from 'svelte/transition';
 	import Icon from './Icon.svelte';
 	import MobileNavigationBarItem from './MobileNavigationBarItem.svelte';
 	import NavigationBarItem from './NavigationBarItem.svelte';
@@ -56,7 +57,9 @@
 	{#if !collapsed}
 		<!-- collapsable mobile menu -->
 		<div
-			class="absolute top-0 left-0 h-screen w-screen space-y-8 bg-blue-950/60 px-4 py-20 backdrop-blur-2xl"
+			in:fly={{ y: -20, duration: 200 }}
+			out:fly={{ y: -20, duration: 200 }}
+			class="absolute top-0 left-0 h-screen w-screen space-y-8 bg-slate-950/80 px-4 py-20 backdrop-blur-2xl"
 		>
 			<a
 				href="/apply"

@@ -1,12 +1,18 @@
 import type { PageLoad } from './$types';
-import { readRows } from '$lib/app/lib/supabase';
+import { getSubmissionByReceipt, readRows } from '$lib/app/lib/supabase';
+import { error } from '@sveltejs/kit';
 export const load: PageLoad = async ({ params }) => {
-	const submissions = await readRows('spef_submissions_anon', { id: params.slug });
-	const submission = submissions.data ? (submissions.data[0] ?? null) : null;
-	const pageTitle = submission.full_name ?? 'Submission not found';
+	const { data, error: resultError } = await getSubmissionByReceipt(params.slug);
+	if (resultError) {
+		throw error(404, 'Submission not found');
+	} else if (data.length === 0) {
+		throw error(404, 'Submission not found');
+	}
+	const submission = data ?? null;
 	return {
-		title: `${pageTitle}`,
-		submission,
+		title: 'Viewing submission',
+		submission: submission ? (submission[0] ?? submission) : null,
+		receipt: params.slug,
 		id: 'myscholarship'
 	};
 };

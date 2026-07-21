@@ -22,6 +22,7 @@ import type {
 	AcademicTerm,
 	ExpandedSPEFSubmission
 } from './types';
+import { generateRandomString } from './helper_functions';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://localhost:54321';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY || 'key';
@@ -297,12 +298,13 @@ export const getSignedURL = async (bucket: string, path: string, expiresIn: numb
 export const uploadInitialSPEF = async (
 	term: { term_number: number; academic_year: number },
 	studentNumber: string,
+	receipt: string,
 	blob: Blob
 ) => {
 	const response = await supabase.storage
 		.from('spef')
 		.upload(
-			`anonymous/${term.term_number}-${term.academic_year}/${studentNumber}_SPEF_Initial.pdf`,
+			`anonymous/${term.term_number}-${term.academic_year}/${studentNumber}_${receipt}-initialspef.pdf`,
 			blob,
 			{
 				cacheControl: '3600',
@@ -358,31 +360,25 @@ export async function submitInitialSPEF(
 	term: { term_number: number; academic_year: number; id: number },
 	anonSubmission: { fullName: string; email: string; studentNumber: string; programYear: string }
 ) {
-	const uploadResult = await uploadInitialSPEF(term, anonSubmission.studentNumber, file);
+	const now = new Date();
+	const receipt = `submission-${generateRandomString(20)}-${now.valueOf()}`;
+	const uploadResult = await uploadInitialSPEF(term, anonSubmission.studentNumber, receipt, file);
 
 	if (uploadResult && term.id) {
-		return await supabase
-			.from('spef_submissions_anon')
-			.upsert(
-				{
-					term: term.id,
-					path: uploadResult,
-					full_name: anonSubmission.fullName,
-					email: anonSubmission.email,
-					student_number: anonSubmission.studentNumber,
-					program_year: anonSubmission.programYear
-				},
-				{
-					onConflict: 'term,student_number'
-				}
-			)
-			.select('*')
-			.single<{
-				id: string;
-				created_at: string;
-				term: number;
-				path: string;
-			}>();
+		const { error } = await supabase.from('spef_submissions_anon').insert({
+			term: term.id,
+			path: uploadResult,
+			full_name: anonSubmission.fullName,
+			email: anonSubmission.email,
+			student_number: anonSubmission.studentNumber,
+			program_year: anonSubmission.programYear,
+			receipt
+		});
+		if (!error) {
+			return receipt;
+		} else {
+			throw new Error('Invalid submission. Existing submission might already be present');
+		}
 	} else {
 		throw new Error('Failed to submit');
 	}
@@ -405,26 +401,9 @@ export async function getSPEFLink(path: string) {
 	}
 	return data.signedUrl;
 }
-export async function getAllSPEFSubmissions(
-	termId?: number
-): Promise<PostgrestSingleResponse<ExpandedSPEFSubmission[]>> {
-	if (termId) {
-		return await supabase
-			.from('spef_submissions_expanded')
-			.select('*')
-			.eq('term', termId)
-			.order('created_at', { ascending: false });
-	}
 
-	return await supabase
-		.from('spef_submissions_expanded')
-		.select('*')
-		.order('created_at', { ascending: false });
-}
-export async function getAnonSubmissionsByStudentNumber(studentNumber: string) {
-	return await supabase
-		.from('spef_submissions_anon')
-		.select(`*,academic_terms (term_number, academic_year)`)
-		.eq('student_number', studentNumber)
-		.order('created_at', { ascending: false });
+export async function getSubmissionByReceipt(receipt: string) {
+	return await supabase.rpc('get_anon_submission', {
+		p_receipt: receipt
+	});
 }
