@@ -12,6 +12,7 @@
 	import type { AcademicTerm } from '$lib/app/lib/types';
 	import { initialSpefSchema, type InitialSPEForm } from '$lib/app/lib/zod/spef_forms';
 	import { onMount } from 'svelte';
+	import SignatureField from './SignatureField.svelte';
 
 	let isSubmitting = $state(false);
 	let data: InitialSPEForm = $state({
@@ -62,6 +63,8 @@
 	let events: { title: string }[] = $state([]);
 	let error = $state<string>('');
 	let generatedSPEFLink: string | null = $state(null);
+	let signatureClearRequested: () => void = $state(() => {});
+	let signatureBase64 = $state('');
 	async function handleSubmit() {
 		isSubmitting = true;
 		try {
@@ -69,7 +72,7 @@
 			if (!result.success) {
 				throw new Error(result.error.issues[0].message);
 			}
-			const link = await generateInitialSPEF(result.data);
+			const link = await generateInitialSPEF({ ...result.data, signature: signatureBase64 });
 			generatedSPEFLink = link;
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'An unknown error occurred';
@@ -78,6 +81,7 @@
 		}
 	}
 	function handleClear() {
+		signatureClearRequested();
 		data = {
 			name: '',
 			studentNumber: '',
@@ -86,7 +90,7 @@
 			programYear: '',
 			termAppliedFor: '',
 			recentlyAttendedEvent: '',
-			isMember: true,
+			isMember: false,
 			spasId: '',
 			signature: ''
 		};
@@ -106,6 +110,7 @@
 		a.click();
 		a.remove();
 	}
+
 	onMount(async () => {
 		try {
 			const { data: termsData, error: termsError } = await getAcademicTerms();
@@ -200,6 +205,15 @@
 				</select>
 			</label>
 		</div>
+	</div>
+	<div class="flex w-full flex-col items-center justify-center">
+		<span class="mb-8 text-white italic">Append signature here</span>
+		<SignatureField
+			onSave={(data) => {
+				signatureBase64 = data;
+			}}
+			bind:onClearRequested={signatureClearRequested}
+		></SignatureField>
 	</div>
 	<div class="mt-12 flex w-full items-center justify-center gap-2 text-white">
 		<input
