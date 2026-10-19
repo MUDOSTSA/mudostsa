@@ -49,7 +49,7 @@
 	async function handleDownloadBlank() {
 		downloading = true;
 		try {
-			const pathResult = await getFilePath('spef_latest');
+			const pathResult = await getFilePath('spef_beta');
 
 			if (!pathResult.data) return;
 
