@@ -27,7 +27,7 @@ export function fileTypeToMime(fileType: string): string {
 	}
 }
 
-const spefTemplate = 'spef_latest';
+const spefTemplate = 'spef_beta';
 const fieldMapping: {
 	name: string;
 	studentNumber: string;
@@ -45,27 +45,27 @@ const fieldMapping: {
 	isMemberNo: string;
 	attendedEvent: string;
 } = {
-	name: 'Text-bafh2ze7Fm',
-	studentNumber: 'Text-IHc0IF0Bug',
-	programYear: 'Text-PPvTUfNbo8',
-	spasID: 'Text-fjdZ-0s-lI',
-	contactNumber: 'Text-P14qdtL6Cz',
-	email: 'Text-Ut9Cbv9ikN',
-	landbankAccount: 'Text-JnqiP06Tmk',
-	gwa: 'Text-yxpTA6yn6M',
-	term: 'Text-81bURyl7do',
-	remainingUnits: 'Text-f_oaVMe4iB',
-	attendedEventYes: 'CheckBox-DjF-hvvvm6',
-	attendedEventNo: 'CheckBox-6r6FuIGWC6',
-	isMemberYes: 'CheckBox-BePJIBcpfk',
-	isMemberNo: 'CheckBox-ZqHzRXIbw_',
-	attendedEvent: 'Text-GyWmktTUtQ'
+	name: 'text_12a7g',
+	studentNumber: 'text_27x4f',
+	programYear: 'text_36i4g',
+	spasID: 'text_49c9p',
+	contactNumber: 'text_77n7p',
+	email: 'text_69e6g',
+	landbankAccount: 'text_57s4c',
+	gwa: 'text_83t6v',
+	term: 'text_110p8b',
+	remainingUnits: 'text_94w9o',
+	attendedEventYes: 'checkbox_144n9c',
+	attendedEventNo: 'checkbox_153p6o',
+	isMemberYes: 'checkbox_168v1m',
+	isMemberNo: 'checkbox_177i0s',
+	attendedEvent: 'text_189j9d'
 };
 const coordinates = {
 	ecm: {
 		page: 0,
 		x: 45,
-		y: 447
+		y: 465
 	},
 	grades: {
 		page: 1,
@@ -75,12 +75,12 @@ const coordinates = {
 	signatureFieldBottomCenter: {
 		page: 1,
 		x: 202,
-		y: 644
+		y: 630
 	},
 	dateField: {
 		page: 1,
 		x: 423,
-		y: 644
+		y: 630
 	},
 	internalsSignatureFieldBottomCenter: {
 		page: 1,
@@ -239,10 +239,20 @@ async function getImageBytes(source: string) {
 
 	return new Uint8Array(await res.arrayBuffer());
 }
-export async function generateFinalSPEF(initialSpef: File, data: FinalSPEForm) {
+export async function generateFinalSPEF(data: FinalSPEForm) {
 	console.log('Generating final SPEF with data:', data);
-	const pdfDoc = await PDFDocument.load(await initialSpef.arrayBuffer());
+	const filePath = await getFilePath(spefTemplate);
+	if (!filePath.data?.file_path) {
+		throw new Error('SPEF template file path not found');
+	}
+	const spefLink = await getSignedURL('documents', filePath.data.file_path);
+	if (!spefLink.data?.signedUrl) {
+		throw new Error('Failed to get signed URL for SPEF template');
+	}
+
+	const pdfDoc = await getPDF(spefLink.data.signedUrl);
 	const form = pdfDoc.getForm();
+	console.log(form.getFields());
 
 	form.getTextField(fieldMapping.name).setText(data.name);
 	form.getTextField(fieldMapping.studentNumber).setText(data.studentNumber);
@@ -288,7 +298,7 @@ export async function generateFinalSPEF(initialSpef: File, data: FinalSPEForm) {
 				const { height } = gradesPage.getSize();
 
 				// Limit height to 160, maintain aspect ratio
-				const maxGradesHeight = 226;
+				const maxGradesHeight = 200;
 				const originalGradesDims = gradesImage.size();
 				const gradesScale = Math.min(maxGradesHeight / originalGradesDims.height, 1);
 				const scaledGradesWidth = originalGradesDims.width * gradesScale;
@@ -345,6 +355,53 @@ export async function generateFinalSPEF(initialSpef: File, data: FinalSPEForm) {
 		}
 	}
 	//
+
+	const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+	const fontSize = 12;
+	const sigPage = pages[coordinates.signatureFieldBottomCenter.page];
+	const datePage = pages[coordinates.dateField.page];
+	const { height: sigPageHeight } = sigPage.getSize();
+	const { height: datePageHeight } = datePage.getSize();
+	const sigTextWidth = font.widthOfTextAtSize(data.name, fontSize);
+	const dateTextWidth = font.widthOfTextAtSize(new Date().toLocaleDateString(), fontSize);
+	sigPage.drawText(data.name, {
+		x: coordinates.signatureFieldBottomCenter.x - sigTextWidth / 2,
+		y: sigPageHeight - coordinates.signatureFieldBottomCenter.y,
+		size: fontSize,
+		font: font,
+		color: rgb(0, 0, 0)
+	});
+	datePage.drawText(new Date().toLocaleDateString(), {
+		x: coordinates.dateField.x - dateTextWidth / 2,
+		y: datePageHeight - coordinates.dateField.y,
+		size: fontSize,
+		font: font,
+		color: rgb(0, 0, 0)
+	});
+
+	if (data.signature) {
+		const signatureBinary = atob(data.signature.split(',')[1]);
+		const signatureBytes = new Uint8Array(signatureBinary.length);
+
+		for (let i = 0; i < signatureBinary.length; i++) {
+			signatureBytes[i] = signatureBinary.charCodeAt(i);
+		}
+		const signatureImage = await pdfDoc.embedPng(signatureBytes);
+		if (signatureImage) {
+			const maxSignatureHeight = 50;
+			const originalSignatureDims = signatureImage.size();
+			const signatureScale = Math.min(maxSignatureHeight / originalSignatureDims.height, 1);
+			const scaledSignatureWidth = originalSignatureDims.width * signatureScale;
+			const scaledSignatureHeight = originalSignatureDims.height * signatureScale;
+
+			sigPage.drawImage(signatureImage, {
+				x: coordinates.signatureFieldBottomCenter.x - scaledSignatureWidth / 2,
+				y: sigPageHeight - coordinates.signatureFieldBottomCenter.y - 12,
+				width: scaledSignatureWidth,
+				height: scaledSignatureHeight
+			});
+		}
+	}
 
 	const pdfBytes = await pdfDoc.save();
 	const pdfBuffer = new ArrayBuffer(pdfBytes.byteLength);

@@ -18,12 +18,7 @@
 	import { onDestroy, onMount } from 'svelte';
 
 	import { getAcademicTerms, getEventTitles } from '../lib/supabase';
-
-	let {
-		initialSpefFile
-	}: {
-		initialSpefFile: File;
-	} = $props();
+	import SignatureField from './SignatureField.svelte';
 
 	let gradesInput: HTMLInputElement;
 	let ecmInput: HTMLInputElement;
@@ -46,6 +41,8 @@
 		remainingNumberOfUnits: 0,
 		latestGWA: 0
 	});
+
+	let signatureBase64 = $state('');
 
 	const fields: {
 		label: string;
@@ -95,19 +92,7 @@
 	let error = $state('');
 
 	let generatedSPEFLink: string | null = $state(null);
-
-	async function fillFromPDF() {
-		try {
-			const extractedData = await extractDataFromPDF(initialSpefFile);
-
-			data = {
-				...data,
-				...extractedData
-			};
-		} catch (err) {
-			error = err instanceof Error ? err.message : 'An unknown error occurred';
-		}
-	}
+	let signatureClearRequested: () => void = $state(() => {});
 
 	async function handleSubmit() {
 		isSubmitting = true;
@@ -119,7 +104,7 @@
 				throw new Error(result.error.issues[0].message);
 			}
 
-			generatedSPEFLink = await generateFinalSPEF(initialSpefFile, result.data);
+			generatedSPEFLink = await generateFinalSPEF({ ...result.data, signature: signatureBase64 });
 		} catch (err) {
 			console.error(err);
 			error = err instanceof Error ? err.message : 'An unknown error occurred';
@@ -129,6 +114,7 @@
 	}
 
 	function handleClear() {
+		signatureClearRequested();
 		data = {
 			name: '',
 			studentNumber: '',
@@ -190,10 +176,6 @@
 
 		input.value = '';
 	}
-
-	$effect(() => {
-		fillFromPDF();
-	});
 
 	onMount(async () => {
 		try {
@@ -415,6 +397,16 @@
 				</button>
 			</div>
 		{/if}
+	</div>
+
+	<div class="flex w-full flex-col items-center justify-center">
+		<span class="mb-8 text-white italic">Append signature here</span>
+		<SignatureField
+			onSave={(data) => {
+				signatureBase64 = data;
+			}}
+			bind:onClearRequested={signatureClearRequested}
+		></SignatureField>
 	</div>
 
 	<div class="mt-12 flex w-full items-center justify-center gap-2 text-white">

@@ -40,7 +40,8 @@ export const finalSpefSchema = z.object({
 	latestGWA: z.number().min(1, 'Latest GWA is required').max(5, 'Latest GWA must be 5 or below'),
 	landbankAccount: z.string().min(1, 'Landbank account number is required'),
 	gradesPhoto: z.string().min(1, 'Screenshot of grades is required'),
-	ecmPhoto: z.string().min(1, 'Electronic Certificate of Matriculation [eCM] is required')
+	ecmPhoto: z.string().min(1, 'Electronic Certificate of Matriculation [eCM] is required'),
+	signature: z.string().optional().or(z.literal(''))
 });
 
 export type FinalSPEForm = z.infer<typeof finalSpefSchema>;
