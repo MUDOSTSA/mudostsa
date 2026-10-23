@@ -312,7 +312,7 @@
 						type="number"
 						id="latestGWA"
 						name="latestGWA"
-						step="0.001"
+						step="0.0001"
 						bind:value={data.latestGWA}
 						disabled={isSubmitting}
 						required
@@ -331,6 +331,7 @@
 						id="remainingNumberOfUnits"
 						name="remainingNumberOfUnits"
 						bind:value={data.remainingNumberOfUnits}
+						step="0.5"
 						disabled={isSubmitting}
 						required
 					/>
